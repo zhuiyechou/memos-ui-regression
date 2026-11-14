@@ -1,0 +1,17 @@
+{
+  "name": "memos-ui-regression",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Memos 笔记应用的 Playwright UI 回归基线 + Playwright MCP 探索式测试",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "regress": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-regression.ps1",
+    "report": "playwright show-report",
+    "mcp": "playwright-mcp --port 8931"
+  },
+  "devDependencies": {
+    "@playwright/mcp": "latest",
+    "@playwright/test": "1.65.0"
+  }
+}

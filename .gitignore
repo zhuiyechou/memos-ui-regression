@@ -1,0 +1,17 @@
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+.auth/
+probe.png
+composer*.png
+main.png
+timeline*.png
+menu.png
+search*.png
+created*.png
+edit-dialog.png
+ancestors.json
+reports/
+.idea/
+.playwright-mcp/

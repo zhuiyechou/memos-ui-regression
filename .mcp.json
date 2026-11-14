@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "memos-playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.85",
+        "--port",
+        "8931",
+        "--browser",
+        "chromium",
+        "--viewport-size",
+        "1440x900"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "D:/ms-playwright"
+      }
+    }
+  }
+}
