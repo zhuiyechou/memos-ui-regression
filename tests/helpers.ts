@@ -7,8 +7,18 @@ export function memoCard(page: Page, text: string) {
   return page.locator('.relative.group').filter({ hasText: text }).first();
 }
 
+async function expectNoDialog(page: Page) {
+  const dialogs = page.locator('[role=dialog]');
+  try {
+    await expect(dialogs).toHaveCount(0);
+  } catch {
+    const text = (await dialogs.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').slice(0, 120));
+    throw new Error(`操作前存在 ${await dialogs.count()} 个残留弹窗: ${JSON.stringify(text)}`);
+  }
+}
+
 export async function openComposer(page: Page) {
-  await expect(page.locator('[role=dialog]')).toHaveCount(0);
+  await expectNoDialog(page);
   await page.locator('[data-new-memo-trigger=true]').first().click({ force: true });
   const editor = page.locator('[role=dialog] [contenteditable="true"]').last();
   await editor.waitFor({ state: 'visible' });
@@ -25,7 +35,7 @@ export async function createMemo(page: Page, text: string) {
 }
 
 export async function openCardMenu(page: Page, text: string) {
-  await expect(page.locator('[role=dialog]')).toHaveCount(0);
+  await expectNoDialog(page);
   const card = memoCard(page, text);
   await expect(card).toBeVisible();
   await card.locator('button[aria-label=More]').click({ force: true });

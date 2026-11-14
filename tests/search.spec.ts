@@ -39,6 +39,9 @@ test('搜索大小写不敏感', async ({ page }) => {
 });
 
 test('点击 Clear filters 后时间线恢复', async ({ page }) => {
+  const text = memoText('清空筛选');
+  await createMemo(page, text);
+
   await searchMemos(page, `zzz-clear-${Date.now()}`);
   await expect(page.getByText('No matching memos')).toBeVisible();
 
@@ -46,7 +49,11 @@ test('点击 Clear filters 后时间线恢复', async ({ page }) => {
   await page.waitForTimeout(1000);
 
   await expect(page).not.toHaveURL(/filter=/);
-  await expect(page.locator('article.relative.group').first()).toBeVisible();
+  await expect(memoCard(page, text)).toBeVisible();
+
+  await page.goto('/');
+  await page.waitForTimeout(1200);
+  await deleteMemo(page, text);
 });
 
 test('搜索部分关键词能命中 memo', async ({ page }) => {
