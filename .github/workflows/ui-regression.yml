@@ -43,15 +43,28 @@ jobs:
       - run: npx playwright install --with-deps chromium
 
       - name: Run Playwright regression
+        id: regression
+        continue-on-error: true
         env:
           MEMOS_URL: http://127.0.0.1:5230
           MEMOS_USER: admin
           MEMOS_PASS: Memos@2026
-        run: npx playwright test --reporter=list --reporter=html
+          PLAYWRIGHT_JSON_OUTPUT_NAME: ci-results.json
+        run: npx playwright test --reporter=list --reporter=html --reporter=json
+
+      - name: Summarize failures
+        if: always()
+        run: node scripts/ci-summary.mjs
+
+      - name: Fail the job if regression failed
+        if: steps.regression.outcome == 'failure'
+        run: exit 1
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: playwright-report
+          path: |
+            playwright-report
+            ci-results.json
           retention-days: 14

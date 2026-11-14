@@ -15,3 +15,4 @@ ancestors.json
 reports/
 .idea/
 .playwright-mcp/
+ci-results.json
