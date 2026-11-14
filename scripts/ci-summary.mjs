@@ -3,6 +3,7 @@ import fs from 'node:fs';
 const SUMMARY = process.env.GITHUB_STEP_SUMMARY;
 const FILE = 'ci-results.json';
 const out = [];
+const failures = [];
 
 function collect(suite, trail, failures) {
   for (const spec of suite.specs || []) {
@@ -20,7 +21,6 @@ if (!fs.existsSync(FILE)) {
 } else {
   const report = JSON.parse(fs.readFileSync(FILE, 'utf8'));
   const s = report.stats || {};
-  const failures = [];
   collect({ suites: report.suites || [] }, [], failures);
 
   out.push(
@@ -41,4 +41,11 @@ if (!fs.existsSync(FILE)) {
 
 const text = out.join('\n') + '\n';
 console.log(text);
+
+// 注解会挂到 check run 上，可通过公开 API 读取，不依赖登录看日志
+const esc = (v) => String(v).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+for (const f of failures) {
+  console.log(`::error title=${esc(f.title)}::${esc(f.message)}`);
+}
+
 if (SUMMARY) fs.appendFileSync(SUMMARY, text);
