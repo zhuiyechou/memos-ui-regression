@@ -92,7 +92,7 @@ D01（纯空格可保存为空 memo）用 `test.fail()` 登记，属于预期失
 
 ## CI / 每日回归
 
-两条路都配好了：本机每天定时跑，仓库推送后 GitHub Actions 跑。
+两条路都配好了：本机每天定时跑，仓库推送后 GitHub Actions 跑。代码在 <https://github.com/zhuiyechou/memos-ui-regression>。
 
 ### 本机：一键脚本 + 计划任务
 
@@ -117,11 +117,13 @@ Unregister-ScheduledTask -TaskName MemosUIRegression
 
 ### GitHub Actions：`.github/workflows/ui-regression.yml`
 
-每天 09:30（北京时间）定时触发，也支持手动 `workflow_dispatch`：
+每天 09:30（北京时间）定时触发，推送到 `main` 和手动 `workflow_dispatch` 也会触发：
 
 1. `docker run neosmemo/memos:stable` 起一个干净实例（每次都是全新数据库，顺带验证首次建号流程）；
 2. `npm ci` + `npx playwright install --with-deps chromium`；
 3. 执行全量用例，失败也照样上传 `playwright-report` 工件，保留 14 天。
+
+全新实例建完管理员会弹 “Welcome to Memos” 首次引导框，本机已初始化过的实例不会出现，这是最初 CI 61 条失败的原因；`auth.setup.ts` 在保存 `storageState` 前把它点掉，两种实例都能跑。
 
 ## MCP 探索入口
 
@@ -158,7 +160,7 @@ Unregister-ScheduledTask -TaskName MemosUIRegression
 
 - 仅覆盖 Chromium 单浏览器，`workers=1`，未做多浏览器/并发矩阵。
 - 部分选择器依赖英文界面文案（`Save / Update / Delete / More / Pin / Archive`），切中文界面需同步调整。
-- CI 已配置（本机每日计划任务 + GitHub Actions），但项目尚未推送到 GitHub 仓库，Actions 侧未实际触发过。
+- CI 已配置并在 GitHub Actions 上实际跑通；Actions 机器是全新实例，本地老实例的用例差异靠 `auth.setup.ts` 兼容。
 - 未覆盖多用户数据隔离、附件上传、性能/分页与大文件场景、API/gRPC 层。
 
 ## 简历可写点

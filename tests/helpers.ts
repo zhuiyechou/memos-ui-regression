@@ -20,7 +20,7 @@ export async function openComposer(page: Page) {
 export async function createMemo(page: Page, text: string) {
   const editor = await openComposer(page);
   await editor.pressSequentially(text, { delay: 5 });
-  await page.getByRole('button', { name: /^Save$/ }).click();
+  await page.locator('[role=dialog]').getByRole('button', { name: /^Save$/ }).click();
   await expect(page.getByText(text).first()).toBeVisible();
 }
 

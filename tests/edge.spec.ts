@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createMemo, deleteMemo, memoCard, memoText, openCardMenu } from './helpers';
+import { createMemo, deleteMemo, memoCard, memoText, openCardMenu, openComposer } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -10,14 +10,10 @@ test.beforeEach(async ({ page }) => {
 test('纯空格不能创建 memo（D01）', async ({ page }) => {
   test.fail(true, 'D01: 纯空格可以保存为空 memo');
 
-  await page.locator('[data-new-memo-trigger=true]').first().click({ force: true });
-  const editor = page.getByRole('textbox').last();
-  await editor.waitFor();
-  await page.waitForTimeout(800);
-  await editor.click();
+  const editor = await openComposer(page);
   await editor.pressSequentially('   ');
 
-  await expect(page.getByRole('button', { name: /^Save$/ })).toBeDisabled();
+  await expect(page.locator('[role=dialog]').getByRole('button', { name: /^Save$/ })).toBeDisabled();
 });
 
 test('刷新后 memo 仍在', async ({ page }) => {

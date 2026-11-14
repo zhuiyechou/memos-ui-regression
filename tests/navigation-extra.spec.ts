@@ -12,7 +12,7 @@ test('Calendar 页面可打开并返回时间线', async ({ page }) => {
   await expect(page).toHaveURL(/\/calendar/);
 
   await page.getByRole('link', { name: 'Timeline' }).first().click();
-  await expect(page).toHaveURL(/127\.0\.0\.1:5230\/$/);
+  await expect(page).toHaveURL((url) => url.pathname === '/');
 });
 
 test('Attachments 页面可打开', async ({ page }) => {
@@ -30,7 +30,7 @@ test('详情页支持浏览器后退和前进', async ({ page }) => {
   await expect(page).toHaveURL(/\/memos\//);
 
   await page.goBack();
-  await expect(page).toHaveURL(/127\.0\.0\.1:5230\/$/);
+  await expect(page).toHaveURL((url) => url.pathname === '/');
   await expect(memoCard(page, text)).toBeVisible();
 
   await page.goForward();
