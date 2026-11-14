@@ -50,5 +50,8 @@ test('删除 memo 后从时间线消失', async ({ page }) => {
   const text = memoText('待删除');
   await createMemo(page, text);
   await deleteMemo(page, text);
-  await expect(page.getByText(text)).toHaveCount(0);
+
+  await page.reload();
+  await expect(page.locator('[data-new-memo-trigger=true]').first()).toBeVisible();
+  await expect(memoCard(page, text)).toHaveCount(0);
 });

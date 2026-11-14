@@ -31,7 +31,8 @@ export async function createMemo(page: Page, text: string) {
   const editor = await openComposer(page);
   await editor.pressSequentially(text, { delay: 5 });
   await page.locator('[role=dialog]').getByRole('button', { name: /^Save$/ }).click();
-  await expect(page.getByText(text).first()).toBeVisible();
+  await expect(page.locator('[role=dialog]')).toHaveCount(0);
+  await expect(memoCard(page, text)).toBeVisible();
 }
 
 export async function openCardMenu(page: Page, text: string) {
