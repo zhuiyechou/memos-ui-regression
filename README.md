@@ -67,11 +67,11 @@ Cleanup done.
 Regression finished with exit code 0
 ```
 
-此前 39 条版本连续三轮 40 passed，用于验证用例稳定性；新增 25 条后整轮 65 个执行（64 业务 + 1 setup）全过，D01 预期失败计入 expected。
+此前 39 条阶段连续跑过三轮验证稳定性；扩到 64 条后整轮 65 个执行（64 业务 + 1 setup）全过，D01 预期失败计入 expected。
 
 D01（纯空格可保存为空 memo）用 `test.fail()` 登记，属于预期失败，计入 expected，退出码仍为 0。整轮结束后 `scripts\cleanup-e2e.mjs` 自动清理，时间线与归档页的 `E2E-` 残留为 0。
 
-另外做过断言有效性验证：把某条用例的预期文本故意改成页面不可能出现的值，用例确实变红并输出了实际文本，确认断言不是空转。
+另外做过断言有效性验证：临时把预期改成页面不可能出现的文本，用例如期变红，确认断言不会空转。
 
 ## 已知缺陷 D01：纯空格可保存为空 memo
 
@@ -81,7 +81,7 @@ D01（纯空格可保存为空 memo）用 `test.fail()` 登记，属于预期失
 - 实际：生成一张无内容的卡片，占用时间线
 - 影响：时间线出现无意义空卡片，只能手工逐条清理
 - 严重程度：一般（不影响数据正确性，影响可读性）
-- 状态：已提交，用例以 `test.fail()` 登记，修复后删除该标记即可转为普通用例
+- 状态：已记录，用例以 `test.fail()` 标记；上游修复后去掉该标记即可转为普通用例
 
 ## 工程化要点
 
@@ -145,7 +145,7 @@ Unregister-ScheduledTask -TaskName MemosUIRegression
 
 本地验证过：`initialize` 握手成功（serverInfo Playwright 1.66.0-alpha），调用 `browser_navigate` 打开 `http://localhost:5230/` 并返回页面快照，说明 MCP → Chromium → Memos 整条链路通。
 
-## 调试中记录的真实问题
+## 实测确认的界面行为
 
 - Memos 26 的登录页路径是 `/auth`，不是 `/auth/signin`；首次运行是 `/auth/signup`。
 - 卡片编辑是在时间线内就地编辑，保存按钮叫 `Update`，不是新建弹窗的 `Save`。
@@ -164,11 +164,3 @@ Unregister-ScheduledTask -TaskName MemosUIRegression
 - 部分选择器依赖英文界面文案（`Save / Update / Delete / More / Pin / Archive`），切中文界面需同步调整。
 - CI 已配置并在 GitHub Actions 上实际跑通；Actions 机器是全新实例，本地老实例的用例差异靠 `auth.setup.ts` 兼容。
 - 未覆盖多用户数据隔离、附件上传、性能/分页与大文件场景、API/gRPC 层。
-
-## 简历可写点
-
-- 基于 Playwright Test 为自托管 Memos 搭建 64 条 UI 回归用例，覆盖 11 个模块（CRUD、标签、置顶/归档、可见性、Markdown/XSS、搜索边界、会话与响应式），整轮 65 个执行全过，单轮约 6.3 分钟。
-- 接入本机计划任务与 GitHub Actions 做每日回归，自动起服务、归档 HTML/JSON 报告、清理测试数据，以退出码作为流水线门禁。
-- 在边界测试中定位真实缺陷 1 个（纯空格可保存为空 memo），用例用 `test.fail()` 登记，修复后自动转绿提醒。
-- 用 storageState 复用登录态、唯一时间戳前缀保证可重复执行；对断言做反向验证排除空转，并沉淀弹窗动画时序等待，消除了 45 秒超时与偶发失败。
-- 接入 Playwright MCP 做探索式测试，验证 MCP 调用 → 浏览器 → 被测系统的完整链路。
