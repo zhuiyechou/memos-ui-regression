@@ -1,5 +1,7 @@
 # memos-ui-regression：自托管笔记应用的 UI 回归基线 + Playwright MCP
 
+[![ui-regression](https://github.com/zhuiyechou/memos-ui-regression/actions/workflows/ui-regression.yml/badge.svg)](https://github.com/zhuiyechou/memos-ui-regression/actions/workflows/ui-regression.yml)
+
 以 Memos（Go 单二进制、SQLite）为被测系统，用 Playwright Test 维护 64 条可重复执行的 UI 回归用例，覆盖增删改查、标签、置顶/归档、可见性、Markdown 与 XSS、搜索边界、会话与登出、页面导航、移动端视口等 11 个模块；再用 Playwright MCP 做探索式测试入口，并用本机计划任务与 GitHub Actions 做每日回归。
 
 ## 环境
@@ -123,7 +125,7 @@ Unregister-ScheduledTask -TaskName MemosUIRegression
 2. `npm ci` + `npx playwright install --with-deps chromium`；
 3. 执行全量用例，失败也照样上传 `playwright-report` 工件，保留 14 天。
 
-全新实例建完管理员会弹 “Welcome to Memos” 首次引导框，本机已初始化过的实例不会出现，这是最初 CI 61 条失败的原因；`auth.setup.ts` 在保存 `storageState` 前把它点掉，两种实例都能跑。
+全新实例建完管理员会弹 “Welcome to Memos” 首次引导框，而且是在首页渲染后延迟挂载的，本机已初始化过的实例不会出现，这是最初 CI 61 条失败的原因；`auth.setup.ts` 保存 `storageState` 前最多等 5 秒并按按钮角色关掉它，两种实例都能跑。用例失败时会把条数、失败用例和报错写进 job summary，同时打成 check-run 注解，不登录也能查。
 
 ## MCP 探索入口
 
